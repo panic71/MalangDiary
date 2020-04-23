@@ -1,4 +1,4 @@
-package com.example.marlangdiary;
+package org.techtown.malangdiary;
 
 import org.junit.Test;
 
