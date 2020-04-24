@@ -1,6 +1,7 @@
 package org.techtown.malangdiary;
 
 import androidx.annotation.NonNull;
+<<<<<<< HEAD
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,6 +11,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
+=======
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Build;
+import android.os.Bundle;
+import android.view.View;
+>>>>>>> 686534867b2ae6336fc98d22e137f22cf4b8c138
 
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.CalendarMode;
@@ -51,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+<<<<<<< HEAD
 
 
     public void todayDiary(View v) {
@@ -78,4 +88,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+=======
+>>>>>>> 686534867b2ae6336fc98d22e137f22cf4b8c138
 }
