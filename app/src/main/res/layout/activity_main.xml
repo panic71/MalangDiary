@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-<<<<<<< HEAD
+
     android:orientation="vertical"
     tools:context=".MainActivity">
 
@@ -15,8 +15,6 @@
         android:layout_weight="5"
         app:mcv_selectionColor="#a9dbf0cb"
         app:mcv_showOtherDates="defaults">
-
-
     </com.prolificinteractive.materialcalendarview.MaterialCalendarView>
 
     <Button
@@ -29,14 +27,4 @@
         android:text="오늘의 일기"
         app:fontFamily="@font/cookierun_regular" />
 
-=======
-    tools:context=".MainActivity">
-    <com.prolificinteractive.materialcalendarview.MaterialCalendarView
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/calendarView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:mcv_selectionColor="#a9dbf0cb"
-        app:mcv_showOtherDates="defaults" />
->>>>>>> 686534867b2ae6336fc98d22e137f22cf4b8c138
 </LinearLayout>

@@ -25,12 +25,10 @@
         <activity android:name=".MainActivity">
         </activity>
 
-<<<<<<< HEAD
+
         <activity android:name=".DiaryActivity">
         </activity>
 
-=======
->>>>>>> 686534867b2ae6336fc98d22e137f22cf4b8c138
     </application>
 
 </manifest>
