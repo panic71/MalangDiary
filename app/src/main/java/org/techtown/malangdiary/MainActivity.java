@@ -7,17 +7,12 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
-
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.os.Build;
-import android.os.Bundle;
-import android.view.View;
 
 
 import com.prolificinteractive.materialcalendarview.CalendarDay;
@@ -25,9 +20,17 @@ import com.prolificinteractive.materialcalendarview.CalendarMode;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
+
+    Date today = new Date();
+    SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
+    String todayString = timeFormat.format(today);
+    SQLiteDatabase database;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -55,17 +58,32 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
                 // 여기에 날짜 클릭 이벤트 내용 적어주자.
-
+                Intent writeDiary = new Intent(MainActivity.this, DiaryActivity.class);
+                startActivityForResult(writeDiary, 101);
             }
         });
-
     }
 
     public void todayDiary(View v) {
-        Intent writediary = new Intent(this, DiaryActivity.class);
-        startActivityForResult(writediary, 101);
+        database  = openOrCreateDatabase("Diary.db", MODE_PRIVATE, null);
 
+        String CREATE_SQL = "CREATE TABLE IF NOT EXISTS DIARIES (DATE TEXT PRIMARY KEY, TITLE TEXT, CONTENT TEXT);";
+        database.execSQL(CREATE_SQL);
 
+        String SELECT_SQL = "SELECT DATE FROM DIARIES WHERE DATE='" + todayString + "';";
+
+        Cursor c = database.rawQuery(SELECT_SQL, null);
+        int count = c.getCount();
+        c.close();
+        if(count==1){
+            // 일기 내용 보여주는 코드
+            Intent writeDiary = new Intent(this, DiaryActivity.class);
+            startActivityForResult(writeDiary, 101);
+        }
+        else{
+            Intent writeDiary = new Intent(this, DiaryActivity.class);
+            startActivityForResult(writeDiary, 101);
+        }
     }
 
     @Override

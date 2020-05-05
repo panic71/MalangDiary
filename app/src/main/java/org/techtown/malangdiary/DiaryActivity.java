@@ -3,6 +3,7 @@ package org.techtown.malangdiary;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -26,13 +27,14 @@ import java.util.TimeZone;
 public class DiaryActivity extends AppCompatActivity {
 
     private ImageView imageView;
-
     Button dateButton;
     EditText titleEditText;
     EditText contentEditText;
     Date today = new Date();
     SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
     SQLiteDatabase database;
+    Cursor cursor;
+
     private DatePickerDialog.OnDateSetListener callbackMethod;
 
     @Override
@@ -95,22 +97,27 @@ public class DiaryActivity extends AppCompatActivity {
         String title = titleEditText.getText().toString();
         String content = contentEditText.getText().toString();
 
-        // 유효성 검사 통과하면 등록
+//         유효성 검사 통과하면 등록
         if(validData(date, title, content)) {
             createDatabase();
             createTable();
-            insertData(date, title, content);
+
+            String SQL = "SELECT DATE FROM DIARIES WHERE DATE='" + date + "';";
+            cursor = database.rawQuery(SQL, null);
+            int count = cursor.getCount();
+
+            if(count==1){
+                updateData(date, title, content);
+
+            }
+            else{ insertData(date, title, content); }
 
             Intent diaryIntent = new Intent(this, MainActivity.class);
             diaryIntent.putExtra("alarm", "일기가 작성되었어요.");
             setResult(Activity.RESULT_OK, diaryIntent);
             finish();
         }
-        else{
-            Toast.makeText(this, "날짜와 제목, 내용을 작성해주세요.", Toast.LENGTH_SHORT).show();
-        }
-        //일기가 입력되어 ㄱ저장되었으면 OK, 그렇지 않으면 CANCEL이 되어야 함.
-        //지금 DB에 입력하는 게 구현 안 되었으니 걍 누르면 OK를 출력하도록 했음.
+        else{ Toast.makeText(this, "날짜와 제목, 내용을 작성해주세요.", Toast.LENGTH_SHORT).show(); }
     }
 
     public void onDateButtonClick(View view){
@@ -152,11 +159,24 @@ public class DiaryActivity extends AppCompatActivity {
         {
             if(database != null)
             {
-                String sql = "INSERT INTO DIARIES VALUES ('" + date + "', '" + title + "', '" + content + "');";
-                database.execSQL(sql);
+                String SQL = "INSERT INTO DIARIES VALUES ('" + date + "', '" + title + "', '" + content + "');";
+                database.execSQL(SQL);
             }
         }
         catch(Exception e) { e.printStackTrace(); }
+    }
+
+    public void updateData(String date, String title, String content){
+        try{
+            if(database!=null)
+            {
+                String SQL = "UPDATE DIARIES SET TITLE='" + title + "', CONTENT='" + content + "' WHERE DATE='" + date + "';";
+                database.execSQL(SQL);
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void initializeView(){
@@ -166,6 +186,7 @@ public class DiaryActivity extends AppCompatActivity {
     }
 
     public void initializeListener(){
+        // 날짜 선택
         callbackMethod = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
@@ -177,4 +198,5 @@ public class DiaryActivity extends AppCompatActivity {
             }
         };
     }
+
 }
