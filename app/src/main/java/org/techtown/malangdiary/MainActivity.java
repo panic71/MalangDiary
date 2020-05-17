@@ -89,8 +89,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == 101) {
+        // 뒤로가기 버그 수정
+        if (requestCode == 101 && data != null) {
             String alarm = data.getStringExtra("alarm");
             Toast.makeText(getApplicationContext(), " " + alarm, Toast.LENGTH_LONG).show();
         }

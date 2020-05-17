@@ -106,10 +106,7 @@ public class DiaryActivity extends AppCompatActivity {
             cursor = database.rawQuery(SQL, null);
             int count = cursor.getCount();
 
-            if(count==1){
-                updateData(date, title, content);
-
-            }
+            if(count==1){ updateData(date, title, content); }
             else{ insertData(date, title, content); }
 
             Intent diaryIntent = new Intent(this, MainActivity.class);
@@ -117,6 +114,7 @@ public class DiaryActivity extends AppCompatActivity {
             setResult(Activity.RESULT_OK, diaryIntent);
             finish();
         }
+
         else{ Toast.makeText(this, "날짜와 제목, 내용을 작성해주세요.", Toast.LENGTH_SHORT).show(); }
     }
 
