@@ -10,7 +10,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -25,9 +24,7 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Locale;
-import java.util.Set;
 import java.util.TimeZone;
 
 public class DiaryActivity extends AppCompatActivity {
@@ -184,7 +181,6 @@ public class DiaryActivity extends AppCompatActivity {
                 SQLiteStatement p = database.compileStatement(SQL);
                 p.bindBlob(1, img);
                 p.execute();
-                Toast.makeText(this, "이미지가 저장되었읍니다", Toast.LENGTH_SHORT).show();
             }
         }
         catch(Exception e) { e.printStackTrace(); }
