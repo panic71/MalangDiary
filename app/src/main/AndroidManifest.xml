@@ -29,6 +29,9 @@
         <activity android:name=".DiaryActivity">
         </activity>
 
+        <activity android:name=".DiaryViewActivity">
+        </activity>
+
     </application>
 
 </manifest>

@@ -5,9 +5,12 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -17,11 +20,14 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TimeZone;
 
 public class DiaryActivity extends AppCompatActivity {
@@ -68,13 +74,10 @@ public class DiaryActivity extends AppCompatActivity {
             if(resultCode == RESULT_OK) {
                 try {
                     InputStream in = getContentResolver().openInputStream(data.getData());
-
                     Bitmap img = BitmapFactory.decodeStream(in);
                     in.close();
-
                     imageView.setImageBitmap(img);
                 } catch(Exception e) {
-
 
                 }
             }
@@ -84,14 +87,15 @@ public class DiaryActivity extends AppCompatActivity {
             }
 
         }
-
         //앨범에서 사진을 고르면 입력되도록 하고, 뒤로가기를 누르면 취소되었다는 팝업 출력
     }
 
     public void diary_submit(View v) {
         titleEditText = findViewById(R.id.titleText);
         contentEditText = findViewById(R.id.contentText);
+        imageView = findViewById(R.id.imageUpload);
         dateButton = findViewById(R.id.dateButton);
+
 
         String date = dateButton.getText().toString();
         String title = titleEditText.getText().toString();
@@ -99,6 +103,7 @@ public class DiaryActivity extends AppCompatActivity {
 
 //         유효성 검사 통과하면 등록
         if(validData(date, title, content)) {
+
             createDatabase();
             createTable();
 
@@ -106,8 +111,18 @@ public class DiaryActivity extends AppCompatActivity {
             cursor = database.rawQuery(SQL, null);
             int count = cursor.getCount();
 
-            if(count==1){ updateData(date, title, content); }
-            else{ insertData(date, title, content); }
+            if (imageView == null){
+                if(count==1){ updateData(date, title, content); }
+                else{ insertData(date, title, content); }
+            }
+            else{
+                Bitmap bitmap = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] image = stream.toByteArray();
+                if(count==1){ updateData(date, title, content, image); }
+                else{ insertData(date, title, content, image); }
+            }
 
             Intent diaryIntent = new Intent(this, MainActivity.class);
             diaryIntent.putExtra("alarm", "일기가 작성되었어요.");
@@ -139,7 +154,7 @@ public class DiaryActivity extends AppCompatActivity {
     }
 
     public void createTable(){
-        String SQL = "CREATE TABLE IF NOT EXISTS DIARIES (DATE TEXT PRIMARY KEY, TITLE TEXT, CONTENT TEXT);";
+        String SQL = "CREATE TABLE IF NOT EXISTS DIARIES (DATE TEXT PRIMARY KEY, TITLE TEXT, CONTENT TEXT, IMG BLOB);";
         database.execSQL(SQL);
     }
 
@@ -164,6 +179,21 @@ public class DiaryActivity extends AppCompatActivity {
         catch(Exception e) { e.printStackTrace(); }
     }
 
+    public void insertData(String date, String title, String content, byte[] img){
+        try
+        {
+            if(database != null)
+            {
+                String SQL = "INSERT INTO DIARIES VALUES ('" + date + "', '" + title + "', '" + content + "', ?);";
+                SQLiteStatement p = database.compileStatement(SQL);
+                p.bindBlob(1, img);
+                p.execute();
+                Toast.makeText(this, "이미지가 저장되었읍니다", Toast.LENGTH_SHORT).show();
+            }
+        }
+        catch(Exception e) { e.printStackTrace(); }
+    }
+
     public void updateData(String date, String title, String content){
         try{
             if(database!=null)
@@ -177,10 +207,74 @@ public class DiaryActivity extends AppCompatActivity {
         }
     }
 
+    public void updateData(String date, String title, String content, byte[] img){
+        try{
+            if(database!=null)
+            {
+                String SQL = "UPDATE DIARIES SET TITLE='" + title + "', CONTENT='" + content + "', IMG=? WHERE DATE='" + date + "';";
+                SQLiteStatement p = database.compileStatement(SQL);
+                p.bindBlob(1, img);
+                p.execute();
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     public void initializeView(){
+
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
         dateButton = findViewById(R.id.dateButton);
-        String todayString = timeFormat.format(today);
-        dateButton.setText(todayString);
+
+        if (bundle != null){
+            int size = bundle.keySet().size();
+            if (size == 4){
+                String date = intent.getStringExtra("date");
+                String title = intent.getStringExtra("title");
+                String content = intent.getStringExtra("content");
+                byte[] img = intent.getByteArrayExtra("img");
+
+                titleEditText = findViewById(R.id.titleText);
+                contentEditText = findViewById(R.id.contentText);
+                imageView = findViewById(R.id.imageUpload);
+
+                dateButton.setText(date);
+                titleEditText.setText(title);
+                contentEditText.setText(content);
+                imageView.setImageBitmap(BitmapFactory.decodeByteArray(img, 0, img.length));
+            }
+            else if (size == 1){
+                String date = intent.getStringExtra("date");
+                dateButton.setText(date);
+            }
+
+        }
+        else{
+            dateButton.setText(timeFormat.format(today));
+        }
+
+//
+//        if ( false ){
+//            String date = intent.getStringExtra("date");
+//            String title = intent.getStringExtra("title");
+//            String content = intent.getStringExtra("content");
+//            byte[] img = intent.getByteArrayExtra("img");
+//
+//            titleEditText = findViewById(R.id.titleText);
+//            contentEditText = findViewById(R.id.contentText);
+//            imageView = findViewById(R.id.imageUpload);
+//
+//            dateButton.setText(date);
+//            titleEditText.setText(title);
+//            contentEditText.setText(content);
+//            imageView.setImageBitmap(BitmapFactory.decodeByteArray(img, 0, img.length));
+//        }
+//
+//        else{
+//            dateButton.setText(timeFormat.format(today));
+//        }
     }
 
     public void initializeListener(){

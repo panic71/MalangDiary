@@ -31,13 +31,13 @@ public class MainActivity extends AppCompatActivity {
     SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
     String todayString = timeFormat.format(today);
     SQLiteDatabase database;
+    Cursor cursor;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         MaterialCalendarView materialCalendarView = (MaterialCalendarView) findViewById(R.id.calendarView);
 
@@ -58,18 +58,35 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
                 // 여기에 날짜 클릭 이벤트 내용 적어주자.
-                Intent writeDiary = new Intent(MainActivity.this, DiaryActivity.class);
-                startActivityForResult(writeDiary, 101);
+                String dt = timeFormat.format(date.getDate());
+
+                database  = openOrCreateDatabase("Diary.db", MODE_PRIVATE, null);
+                String CREATE_SQL = "CREATE TABLE IF NOT EXISTS DIARIES (DATE TEXT PRIMARY KEY, TITLE TEXT, CONTENT TEXT, IMG BLOB);";
+                database.execSQL(CREATE_SQL);
+                String SELECT_SQL = "SELECT DATE FROM DIARIES WHERE DATE='" + dt + "';";
+                Cursor c = database.rawQuery(SELECT_SQL, null);
+                int count = c.getCount();
+                c.close();
+                if(count==1){
+                    // 일기 내용 보여주는 코드
+                    Intent viewDiary = new Intent(MainActivity.this, DiaryViewActivity.class);
+                    viewDiary.putExtra("date", dt);
+                    startActivityForResult(viewDiary, 101);
+                }
+                else{
+                    Intent writeDiary = new Intent(MainActivity.this, DiaryActivity.class);
+                    writeDiary.putExtra("date", dt);
+                    startActivityForResult(writeDiary, 101);
+                }
+
             }
         });
     }
 
     public void todayDiary(View v) {
         database  = openOrCreateDatabase("Diary.db", MODE_PRIVATE, null);
-
-        String CREATE_SQL = "CREATE TABLE IF NOT EXISTS DIARIES (DATE TEXT PRIMARY KEY, TITLE TEXT, CONTENT TEXT);";
+        String CREATE_SQL = "CREATE TABLE IF NOT EXISTS DIARIES (DATE TEXT PRIMARY KEY, TITLE TEXT, CONTENT TEXT, IMG BLOB);";
         database.execSQL(CREATE_SQL);
-
         String SELECT_SQL = "SELECT DATE FROM DIARIES WHERE DATE='" + todayString + "';";
 
         Cursor c = database.rawQuery(SELECT_SQL, null);
@@ -77,11 +94,13 @@ public class MainActivity extends AppCompatActivity {
         c.close();
         if(count==1){
             // 일기 내용 보여주는 코드
-            Intent writeDiary = new Intent(this, DiaryActivity.class);
-            startActivityForResult(writeDiary, 101);
+            Intent viewDiary = new Intent(this, DiaryViewActivity.class);
+            viewDiary.putExtra("date", todayString);
+            startActivityForResult(viewDiary, 101);
         }
         else{
             Intent writeDiary = new Intent(this, DiaryActivity.class);
+            writeDiary.putExtra("date", todayString);
             startActivityForResult(writeDiary, 101);
         }
     }
