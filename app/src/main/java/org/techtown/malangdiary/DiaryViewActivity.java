@@ -7,38 +7,24 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
-
-import static android.widget.Toast.LENGTH_SHORT;
 
 public class DiaryViewActivity extends AppCompatActivity {
     SQLiteDatabase database;
     Cursor cursor;
-    Date today = new Date();
-    SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
-    String todayString = timeFormat.format(today);
     String date;
     String title;
     String content;
     byte[] img;
-    TextView dateText;
-    TextView titleText;
-    TextView contentText;
-    ImageView imgView;
-    Button editButton;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_diary_view);
         initializeView();
@@ -56,15 +42,15 @@ public class DiaryViewActivity extends AppCompatActivity {
         cursor.moveToFirst();
 
         date = cursor.getString(cursor.getColumnIndex("DATE"));
-        title = cursor.getString(1);
-        content = cursor.getString(2);
-        img = cursor.getBlob(3);
+        title = cursor.getString(cursor.getColumnIndex("TITLE"));
+        content = cursor.getString(cursor.getColumnIndex("CONTENT"));
+        img = cursor.getBlob(cursor.getColumnIndex("IMG"));
         Bitmap bitmap = BitmapFactory.decodeByteArray(img, 0, img.length);
 
-        dateText = findViewById(R.id.dateText);
-        titleText = findViewById(R.id.titleText);
-        contentText = findViewById(R.id.contentText);
-        imgView = findViewById(R.id.imgView);
+        TextView dateText = findViewById(R.id.dateText);
+        TextView titleText = findViewById(R.id.titleText);
+        TextView contentText = findViewById(R.id.contentText);
+        ImageView imgView = findViewById(R.id.imgView);
 
         dateText.setText(date);
         titleText.setText(title);

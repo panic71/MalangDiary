@@ -77,17 +77,13 @@ public class DiaryActivity extends AppCompatActivity {
                     Bitmap img = BitmapFactory.decodeStream(in);
                     in.close();
                     imageView.setImageBitmap(img);
-                } catch(Exception e) {
-
-                }
+                } catch(Exception e) { }
             }
             else if(resultCode == RESULT_CANCELED)
             {
                 Toast.makeText(this, "취소되었습니다.", Toast.LENGTH_LONG).show();
             }
-
         }
-        //앨범에서 사진을 고르면 입력되도록 하고, 뒤로가기를 누르면 취소되었다는 팝업 출력
     }
 
     public void diary_submit(View v) {
@@ -249,36 +245,13 @@ public class DiaryActivity extends AppCompatActivity {
                 String date = intent.getStringExtra("date");
                 dateButton.setText(date);
             }
-
         }
         else{
             dateButton.setText(timeFormat.format(today));
         }
-
-//
-//        if ( false ){
-//            String date = intent.getStringExtra("date");
-//            String title = intent.getStringExtra("title");
-//            String content = intent.getStringExtra("content");
-//            byte[] img = intent.getByteArrayExtra("img");
-//
-//            titleEditText = findViewById(R.id.titleText);
-//            contentEditText = findViewById(R.id.contentText);
-//            imageView = findViewById(R.id.imageUpload);
-//
-//            dateButton.setText(date);
-//            titleEditText.setText(title);
-//            contentEditText.setText(content);
-//            imageView.setImageBitmap(BitmapFactory.decodeByteArray(img, 0, img.length));
-//        }
-//
-//        else{
-//            dateButton.setText(timeFormat.format(today));
-//        }
     }
 
     public void initializeListener(){
-        // 날짜 선택
         callbackMethod = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
@@ -290,5 +263,4 @@ public class DiaryActivity extends AppCompatActivity {
             }
         };
     }
-
 }
