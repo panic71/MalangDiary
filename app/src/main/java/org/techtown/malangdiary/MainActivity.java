@@ -6,12 +6,15 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 
@@ -29,12 +32,32 @@ public class MainActivity extends AppCompatActivity {
 
     SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
     SQLiteDatabase database;
+    Button alert;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        alert = (Button)findViewById(R.id.alert);
+
+        alert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder ad = new AlertDialog.Builder(MainActivity.this);
+                ad.setTitle("사용하는법!");
+                ad.setMessage("1.오늘 일기를 쓰고 싶으면 '오늘의 일기' Click!\n\n2.지난 일기를 보고 싶으면 해당 날짜 Click!\n\n" +
+                        "3.수정하고 싶을 때도 해당 날짜 Click!");
+                ad.setNeutralButton("닫기", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                ad.show();
+            }
+        });
 
         MaterialCalendarView materialCalendarView = (MaterialCalendarView) findViewById(R.id.calendarView);
         materialCalendarView.state().edit()
@@ -55,7 +78,11 @@ public class MainActivity extends AppCompatActivity {
                 writeOrViewDiary(timeFormat.format(date.getDate()));
             }
         });
+
+        materialCalendarView.addDecorator();
     }
+
+
 
     public void todayDiary(View v) {
         Date today = new Date();
