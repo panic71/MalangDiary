@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        materialCalendarView.addDecorator();
+        //materialCalendarView.addDecorator();
     }
 
 
